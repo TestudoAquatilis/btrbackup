@@ -74,7 +74,10 @@ Each target setup has a name by which it can be run later.
 # Running Backups
 
 With the example configuration and setup you could simply run:
+
     $ btrbackup.tcl my_backup
 
 You might also want to run somthing like:
+
     $ btrbackup.tcl my_backup | tee backuplog.log
+
