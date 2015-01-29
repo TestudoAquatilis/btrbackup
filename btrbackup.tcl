@@ -286,7 +286,7 @@ namespace eval btrbackup {
 
 				if {$n != "all"} {
 					set startyear  [expr [clock format [clock seconds] -format "%Y"]]
-					set startmonth [expr [clock format [clock seconds] -format "%m"] - $n]
+					set startmonth [expr [clock format [clock seconds] -format "%N"] - $n]
 
 					while {$startmonth < 0} {
 						set startyear  [expr $startyear - 1]
@@ -320,8 +320,8 @@ namespace eval btrbackup {
 
 				set target_date [expr [clock seconds] - $n * 3600 * 24]
 				set startyear  [expr [clock format $target_date -format "%Y"]]
-				set startmonth [expr [clock format $target_date -format "%m"]]
-				set startday   [expr [clock format $target_date -format "%d"]]
+				set startmonth [expr [clock format $target_date -format "%N"]]
+				set startday   [expr [clock format $target_date -format "%e"]]
 
 				set found "false"
 				set result {}
@@ -382,7 +382,7 @@ namespace eval btrbackup {
 			set date_list {}
 
 			# create lists
-			set re "${nameprefix}(\[0-9\]+)-(\[0-9\]+)-(\[0-9\]+)_(\[0-9\]+)-(\[0-9\]+)"
+			set re "${nameprefix}\[0\]*(\[0-9\]+)-\[0\]*(\[0-9\]+)-\[0\]*(\[0-9\]+)_\[0\]*(\[0-9\]+)-\[0\]*(\[0-9\]+)"
 			foreach i_snapshot [glob "${nameprefix}*"] {
 				if {[regexp $re $i_snapshot full year month day hour minute]} {
 					set date [list $year $month $day $hour $minute]
