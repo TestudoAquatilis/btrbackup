@@ -1,6 +1,6 @@
 pkgname=btrbackup
 pkgver=0.3
-pkgrel=1
+pkgrel=2
 pkgdesc="A tcl script for backups from one btrfs filesystem to another using snapshots"
 url="https://github.com/TestudoAquatilis/btrbackup"
 arch=('any')

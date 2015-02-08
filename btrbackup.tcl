@@ -408,6 +408,8 @@ namespace eval btrbackup {
 				}
 			}
 
+			exec sleep 10
+
 			return "true"
 		}
 	}
