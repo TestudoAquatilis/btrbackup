@@ -14,6 +14,8 @@ You need
 
 Copy btrbackup.tcl into a directory in your PATH, e.g. /usr/bin, and btrbackupconfig.tcl
 into /etc. If you use Arch Linux you can use the PKGBUILD file to create a package.
+If you want logrotation, put the logrotate file to /etc/logrotate.d/btrbackup or wherever
+your distro stores logrotate configuration.
 
 # Backup Preparations
 
@@ -77,7 +79,8 @@ With the example configuration and setup you could simply run:
 
     $ btrbackup.tcl my_backup
 
-You might also want to run somthing like:
+Logs will be printed, extended logs including rsync information are kept in
 
-    $ btrbackup.tcl my_backup | tee backuplog.log
+    /var/log/btrbackup.log
+
 

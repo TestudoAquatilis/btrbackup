@@ -1,0 +1,4 @@
+/var/log/btrbackup.log {
+	missingok
+	copytruncate
+}
