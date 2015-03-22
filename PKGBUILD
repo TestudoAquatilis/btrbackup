@@ -1,5 +1,5 @@
 pkgname=btrbackup
-pkgver=0.4
+pkgver=0.5
 pkgrel=1
 pkgdesc="A tcl script for backups from one btrfs filesystem to another using snapshots"
 url="https://github.com/TestudoAquatilis/btrbackup"
@@ -15,8 +15,8 @@ backup=('etc/btrbackupconfig.tcl')
 source=("btrbackup.tcl"
         "btrbackupconfig.tcl"
         "logrotate")
-md5sums=('66ec042f7ddf4efb74b99da8a2b35943'
-         'bc970978cf4d66c6fc67e4d33340907d'
+md5sums=('a2878d9c8f365123c46bc45c2160bc08'
+         '4154c485744e89d1d9c33be3f236c781'
          '4b7917c29f4945e1e3eb79bb31f3f4cd')
 
 package() {

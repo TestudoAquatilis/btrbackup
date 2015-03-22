@@ -435,6 +435,10 @@ namespace eval btrbackup {
 		set config::current::sync_rules_valid "true"
 	}
 
+	proc add_sync_rule_nobtr {src_directory target_subvol target_subdir exclude_list} {
+		add_sync_rule "#NONE" $src_directory $target_subvol $target_subdir $exclude_list
+	}
+
 	proc commit_config {} {
 		config::commit
 	}
@@ -635,6 +639,10 @@ namespace eval btrbackup {
 			if {[llength $snapshot_list] <= 0} {
 				return "true"
 			}
+			# non-snapshot sources
+			if {$fs_mountpoint == "#NONE"} {
+				return "true"
+			}
 
 			set current_subvol [lindex $snapshot_list 0]
 			set remaining_list [lreplace $snapshot_list 0 0]
@@ -676,12 +684,15 @@ namespace eval btrbackup {
 				lappend snapshot_list $subvol
 			}
 
-			if {[catch {exec mount $current_mountpoint} data]} {
-				::log::log_error "Failed to mount $current_mountpoint"
-				::log::log_info $data
-				return "false"
-			} else {
-				::log::log_info "Mounted $current_mountpoint"
+			# non-snapshot sources
+			if {$current_mountpoint != "#NONE"} {
+				if {[catch {exec mount $current_mountpoint} data]} {
+					::log::log_error "Failed to mount $current_mountpoint"
+					::log::log_info $data
+					return "false"
+				} else {
+					::log::log_info "Mounted $current_mountpoint"
+				}
 			}
 
 			set result "true"
@@ -702,11 +713,14 @@ namespace eval btrbackup {
 			if {! $result} {
 				cd /
 				exec sleep 10
-				if {[catch {exec umount $current_mountpoint} data]} {
-					::log::log_error "Failed to umount $current_mountpoint"
-					::log::log_info $data
-				} else {
-					::log::log_info "Umounted $current_mountpoint"
+				# non-snapshot sources
+				if {$current_mountpoint != "#NONE"} {
+					if {[catch {exec umount $current_mountpoint} data]} {
+						::log::log_error "Failed to umount $current_mountpoint"
+						::log::log_info $data
+					} else {
+						::log::log_info "Umounted $current_mountpoint"
+					}
 				}
 			}
 
@@ -715,6 +729,10 @@ namespace eval btrbackup {
 
 		proc cleanup_src_snapshots_from_list {fs_mountpoint snapshot_list snapshot_prefix} {
 			if {[llength $snapshot_list] <= 0} {
+				return "true"
+			}
+			# non-snapshot sources
+			if {$fs_mountpoint == "#NONE"} {
 				return "true"
 			}
 
@@ -763,12 +781,15 @@ namespace eval btrbackup {
 
 			cd /
 			exec sleep 10
-			if {[catch {exec umount $current_mountpoint} data]} {
-				::log::log_error "Failed to umount $current_mountpoint"
-				::log::log_info $data
-				set result "false"
-			} else {
-				::log::log_info "Umounted $current_mountpoint"
+			# non-snapshot sources
+			if {$current_mountpoint != "#NONE"} {
+				if {[catch {exec umount $current_mountpoint} data]} {
+					::log::log_error "Failed to umount $current_mountpoint"
+					::log::log_info $data
+					set result "false"
+				} else {
+					::log::log_info "Umounted $current_mountpoint"
+				}
 			}
 
 			if {! [cleanup_src_snapshots [lreplace $backup_src_list 0 1] $snapshot_prefix]} {
@@ -785,7 +806,11 @@ namespace eval btrbackup {
 
 			foreach {i_src_mnt i_syn_list} $src_list {
 				foreach {j_src_vol j_target_vol j_target_subdir j_excludes} $i_syn_list {
-					set cur_srcdir "${i_src_mnt}/${snapshot_prefix}${j_src_vol}"
+					if {$i_src_mnt == "#NONE"} {
+						set cur_srcdir "${j_src_vol}"
+					} else {
+						set cur_srcdir "${i_src_mnt}/${snapshot_prefix}${j_src_vol}"
+					}
 					set cur_tardir "${target_mountpoint}/${j_target_vol}${j_target_subdir}"
 
 					set cur_cmd [list "rsync"]
@@ -799,7 +824,11 @@ namespace eval btrbackup {
 						lappend cur_cmd "${excl}/**"
 					}
 
-					lappend cur_cmd "${cur_srcdir}/"
+					if {$cur_srcdir == "/"} {
+						lappend cur_cmd "/"
+					} else {
+						lappend cur_cmd "${cur_srcdir}/"
+					}
 					lappend cur_cmd "${cur_tardir}"
 
 					::log::log_info "Syncing volume $j_src_vol"

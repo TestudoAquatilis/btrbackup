@@ -68,9 +68,11 @@ btrbackup::add_target_subvol "backup-home" "snapshots-home" "expire-home"
 #    to /mnt/backup/backup-root/boot. The fifth parameter is a list of exclude rules (in general you can use everything rsync accepts after
 #    the --exclude option. You should exclude subdirectories you later on sync to from a separate source like in the example.
 btrbackup::add_sync_rule "/mnt/root-filesystem" "root-subvol" "backup-root" ""      {"boot" "var"}
-btrbackup::add_sync_rule "/mnt/root-filesystem" "boot-subvol" "backup-root" "/boot" {}
 btrbackup::add_sync_rule "/mnt/root-filesystem" "var-subvol"  "backup-root" "/var"  {}
 btrbackup::add_sync_rule "/mnt/home-filesystem" "home-subvol" "backup-home" ""      {}
+
+# sync-rule for non-btr sources: source directory, target subvolumes, target subdirectory, list of directories to exclude
+btrbackup::add_sync_rule_nobtr "/boot" "backup-root" "/boot" {}
 
 # commit config for this backup target
 # -> if you have multiple drives to sync to you can add the next one after this, starting again
