@@ -813,7 +813,7 @@ namespace eval btrbackup {
 					}
 					set cur_tardir "${target_mountpoint}/${j_target_vol}${j_target_subdir}"
 
-					set cur_cmd [list "rsync"]
+					set cur_cmd [list "nice" "-n" "19" "rsync"]
 
 					foreach opt $rsyn_opts {
 						lappend cur_cmd $opt
