@@ -13,7 +13,7 @@ You need
 # Installation
 
 Copy btrbackup.tcl into a directory in your PATH, e.g. /usr/bin, and btrbackupconfig.tcl
-into /etc. If you use Arch Linux you can use the PKGBUILD file to create a package.
+into /etc.
 If you want logrotation, put the logrotate file to /etc/logrotate.d/btrbackup or wherever
 your distro stores logrotate configuration.
 
