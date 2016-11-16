@@ -24,19 +24,19 @@ namespace eval log {
 	### logging...
 
 	# indentation
-	set log_tab ""
+	variable log_tab ""
 
 	# initial log level
 	if {![info exists log_level]} {
-		set log_level 0
+		variable log_level 0
 	}
 
 	# initial maximum line length
 	if {![info exists max_line]} {
-		set max_line 1024
+		variable max_line 1024
 	}
 
-	set section_line 100
+	variable section_line 100
 
 	# set loglevel hard
 	proc set_log_level {{level "INFO"}} {
@@ -51,7 +51,7 @@ namespace eval log {
 	}
 
 	# temporarily switch loglevels
-	set loglevel_stack {}
+	variable loglevel_stack {}
 
 	proc switch_log_level {level} {
 		variable loglevel_stack
@@ -97,25 +97,25 @@ namespace eval log {
 					set index_s [string first " " $msg_rem]
 					set index_temp_s 0
 					while {$index_s >= 0 && $index_s < $max_line && $index_temp_s >= 0 && $index_temp_s <= $index_s} {
-						set index_temp_s [string first " " $msg_rem [expr $index_s + 1]]
+						set index_temp_s [string first " " $msg_rem [expr {$index_s + 1}]]
 						if {$index_temp_s >= 0 && $index_temp_s < $max_line} {
 							set index_s $index_temp_s
 						}
 					}
 					if {$index_s < 0} {
-						set index_s [expr [string length $msg_rem] - 1]
+						set index_s [expr {[string length $msg_rem] - 1}]
 					}
 
 
 					set msg_cur [string range $msg_rem 0 $index_s]
-					set msg_rem [string range $msg_rem [expr $index_s + 1] end]
+					set msg_rem [string range $msg_rem [expr {$index_s + 1}] end]
 
 					if {$lnum == 0} {
 						log_output "${prefix}${log_tab}${msg_cur} \\"
 					} else {
 						log_output "${prefix}${log_tab}\t${msg_cur} \\"
 					}
-					set lnum [expr $lnum + 1]
+					set lnum [expr {$lnum + 1}]
 				}
 
 				log_output "${prefix}${log_tab}\t${msg_rem}"
@@ -131,28 +131,28 @@ namespace eval log {
 
 		log_output ""
 		log_output ""
-		for {set i 0} {$i < $boldness} {set i [expr $i + 1]} {
+		for {set i 0} {$i < $boldness} {incr i} {
 			log_output "\t${log_tab}$separator"
 		}
 
-		set lrboldness [expr $boldness * 2]
-		set lrseparator "[string repeat \# $lrboldness][string repeat \  [expr $section_line - 2 * $lrboldness]][string repeat \# $lrboldness]"
+		set lrboldness [expr {$boldness * 2}]
+		set lrseparator "[string repeat \# $lrboldness][string repeat \  [expr {$section_line - 2 * $lrboldness}]][string repeat \# $lrboldness]"
 		log_output "\t${log_tab}$lrseparator"
 
-		set title_first [expr $section_line / 2 - [string length $name] / 2]
-		set title_last  [expr $title_first + [string length $name] - 1]
+		set title_first [expr {$section_line / 2 - [string length $name] / 2}]
+		set title_last  [expr {$title_first + [string length $name] - 1}]
 		log_output "\t${log_tab}[string replace $lrseparator $title_first $title_last $name]"
 
 		log_output "\t${log_tab}$lrseparator"
 
-		for {set i 0} {$i < $boldness} {set i [expr $i + 1]} {
+		for {set i 0} {$i < $boldness} {incr i} {
 			log_output "\t${log_tab}$separator"
 		}
 	}
 
-	set log_to_file   "false"
-	set log_to_stdout "true"
-	set log_fd -1
+	variable log_to_file   "false"
+	variable log_to_stdout "true"
+	variable log_fd -1
 
 	proc set_log_file {filename {append_mode "true"}} {
 		variable log_fd
@@ -221,7 +221,7 @@ namespace eval log {
 		set l [string length $log_tab]
 
 		if {$l > 0} {
-			set log_tab [string range $log_tab 0 [expr $l - 2]]
+			set log_tab [string range $log_tab 0 [expr {$l - 2}]]
 		}
 	}
 }
@@ -234,22 +234,22 @@ namespace eval btrbackup {
 	namespace eval config {
 		# temporary storage for config information
 		namespace eval current {
-			set name ""
-			set name_valid "false"
+			variable name ""
+			variable name_valid "false"
 
-			set mountpoint ""
-			set mountpoint_valid "false"
+			variable mountpoint ""
+			variable mountpoint_valid "false"
 
-			set target_list {}
-			set target_list_valid "false"
+			variable target_list {}
+			variable target_list_valid "false"
 
-			set sync_rules {}
-			set sync_rules_valid "false"
+			variable sync_rules {}
+			variable sync_rules_valid "false"
 		}
 
-		set config_error "false"
+		variable config_error "false"
 		# list of all config data
-		set config_list {}
+		variable config_list {}
 
 		# commit current configuration
 		proc commit {} {
@@ -289,15 +289,15 @@ namespace eval btrbackup {
 
 	namespace eval expireconfig {
 		namespace eval current {
-			set name ""
-			set name_valid "false"
+			variable name ""
+			variable name_valid "false"
 
-			set rules {}
-			set rules_valid "false"
+			variable rules_list {}
+			variable rules_valid "false"
 		}
 
-		set config_error "false"
-		set config_list {}
+		variable config_error "false"
+		variable config_list {}
 
 		# commit current configuration
 		proc commit {} {
@@ -314,11 +314,11 @@ namespace eval btrbackup {
 				::log::log_error "No expire rules configured for $current::name."
 			}
 
-			lappend config_list [list $current::name $current::rules]
+			lappend config_list [list $current::name $current::rules_list]
 
 			set current::name ""
 			set current::name_valid "false"
-			set current::rules {}
+			set current::rules_list {}
 			set current::rules_valid "false"
 		}
 	}
@@ -352,7 +352,7 @@ namespace eval btrbackup {
 			return
 		}
 
-		lappend expireconfig::current::rules [list $rule $parameter]
+		lappend expireconfig::current::rules_list [list $rule $parameter]
 		set expireconfig::current::rules_valid "true"
 	}
 
@@ -419,16 +419,16 @@ namespace eval btrbackup {
 			return
 		}
 
-		if {[expr [lsearch $config::current::target_list $target_subvol] % 3] != 0} {
+		if {[expr {[lsearch $config::current::target_list $target_subvol] % 3}] != 0} {
 			::log::log_error "Target-subvolume $target_subvol is not configured in current target-list."
 			set config::config_error "true"
 			return
 		}
-		if {[expr [lsearch $config::current::sync_rules $src_mountpoint] % 2] != 0} {
+		if {[expr {[lsearch $config::current::sync_rules $src_mountpoint] % 2}] != 0} {
 			lappend config::current::sync_rules $src_mountpoint {}
 		}
 
-		set i_current [expr [lsearch $config::current::sync_rules $src_mountpoint] + 1]
+		set i_current [expr {[lsearch $config::current::sync_rules $src_mountpoint] + 1}]
 		set new_synclist [linsert [lindex $config::current::sync_rules $i_current] end $src_subvol $target_subvol $target_subdir $exclude_list]
 		set config::current::sync_rules [lreplace $config::current::sync_rules $i_current $i_current $new_synclist]
 
@@ -458,7 +458,7 @@ namespace eval btrbackup {
 					return $datelist
 				}
 
-				set startrange [expr [llength $datelist] - $n]
+				set startrange [expr {[llength $datelist] - $n}]
 
 				return [lrange $datelist $startrange end]
 			}
@@ -468,10 +468,10 @@ namespace eval btrbackup {
 					return {}
 				}
 
-				set startyear [expr [lindex $datelist 0 0] - 1]
+				set startyear [expr {[lindex $datelist 0 0] - 1}]
 
 				if {$n != "all"} {
-					set startyear [expr [clock format [clock seconds] -format "%Y"] - $n]
+					set startyear [expr {[clock format [clock seconds] -format "%Y"] - $n}]
 				}
 
 				set currentyear $startyear
@@ -493,16 +493,16 @@ namespace eval btrbackup {
 					return {}
 				}
 
-				set startyear  [expr [lindex $datelist 0 0]]
+				set startyear  [expr {[lindex $datelist 0 0]}]
 				set startmonth 0
 
 				if {$n != "all"} {
-					set startyear  [expr [clock format [clock seconds] -format "%Y"]]
-					set startmonth [expr [clock format [clock seconds] -format "%N"] - $n]
+					set startyear  [expr {[clock format [clock seconds] -format "%Y"]}]
+					set startmonth [expr {[clock format [clock seconds] -format "%N"] - $n}]
 
 					while {$startmonth < 0} {
-						set startyear  [expr $startyear - 1]
-						set startmonth [expr $startmonth + 12]
+						set startyear  [expr {$startyear - 1}]
+						set startmonth [expr {$startmonth + 12}]
 					}
 				}
 
@@ -530,10 +530,10 @@ namespace eval btrbackup {
 					return {}
 				}
 
-				set target_date [expr [clock seconds] - $n * 3600 * 24]
-				set startyear  [expr [clock format $target_date -format "%Y"]]
-				set startmonth [expr [clock format $target_date -format "%N"]]
-				set startday   [expr [clock format $target_date -format "%e"]]
+				set target_date [expr {[clock seconds] - $n * 3600 * 24}]
+				set startyear  [expr {[clock format $target_date -format "%Y"]}]
+				set startmonth [expr {[clock format $target_date -format "%N"]}]
+				set startday   [expr {[clock format $target_date -format "%e"]}]
 
 				set found "false"
 				set result {}
@@ -632,8 +632,8 @@ namespace eval btrbackup {
 	## Backup Execution     ##
 	##########################
 	namespace eval run {
-		set src_snapshot_prefix "bckp-snp-"
-		set rsyn_opts [list "-axsv" "--delete"]
+		variable src_snapshot_prefix "bckp-snp-"
+		variable rsyn_opts [list "-axsvXA" "--delete"]
 
 		proc create_src_snapshots_from_list {fs_mountpoint snapshot_list snapshot_prefix} {
 			if {[llength $snapshot_list] <= 0} {
